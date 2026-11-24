@@ -9,8 +9,19 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'D:/dsh/dsh-comfyui-workbench'
+/**
+ * 仓库根按**本文件位置**推导，不写死绝对路径。
+ *
+ * 原先这里是 `const ROOT = 'D:/dsh/dsh-comfyui-workbench'` —— 那正好是原作者
+ * 那台机器的克隆位置。换台机器、换个目录，这条测试就读不到文件、三条用例全挂，
+ * 而报出来的是 ENOENT 而不是"路径写死了"，看起来像真的代码有问题。
+ *
+ * 本仓其它测试（arch.mjs / classes.mjs / costume-dual-source.test.mjs …）都是这么
+ * 从 import.meta.url 推的，这里只是跟上。
+ */
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 test('图片 URL 必须带 source —— 否则切到二次元后图还是写实版的', () => {
   const api = fs.readFileSync(path.join(ROOT, 'src/client/api.ts'), 'utf8')
